@@ -44,7 +44,7 @@ func _process(delta):
 	if Input.is_action_just_pressed("z axis"):
 		matrix = Basis.IDENTITY
 	if Input.is_action_just_pressed("x axis"):
-		matrix = Basis.from_euler(Vector3(0.0, PI * 0.5, 0.0))
+		matrix = Basis.from_euler(Vector3(0.0, -PI * 0.5, 0.0))
 	if Input.is_action_just_pressed("y axis"):
 		matrix = Basis.from_euler(Vector3(PI * 0.5, 0.0, 0.0))
 	

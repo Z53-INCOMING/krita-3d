@@ -1,9 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://bx6yxqrt4mq0v"]
+[gd_scene load_steps=12 format=3 uid="uid://bx6yxqrt4mq0v"]
 
 [ext_resource type="Script" path="res://program.gd" id="1_5rvem"]
 [ext_resource type="Shader" path="res://3d image visualizer.gdshader" id="1_xyavc"]
 [ext_resource type="Shader" path="res://program.gdshader" id="2_1yiai"]
-[ext_resource type="Texture2D" uid="uid://b44cvhtdkeykp" path="res://oak top 3d.png" id="4_k8oem"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h7wj0"]
 shader = ExtResource("2_1yiai")
@@ -15,7 +14,15 @@ shader_parameter/z_offset = 0.5
 shader_parameter/rotation = Basis(1, 0, 0, 0, 1, 0, 0, 0, 1)
 shader_parameter/display_size = 0.5
 shader_parameter/mouse_position = null
-shader_parameter/image = ExtResource("4_k8oem")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hpb36"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qvde2"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qa16k"]
+albedo_color = Color(0, 0, 1, 1)
 
 [sub_resource type="Environment" id="Environment_0bxk3"]
 background_mode = 1
@@ -73,6 +80,21 @@ render_target_update_mode = 4
 transform = Transform3D(0.919767, -0.197057, 0.339408, 0, 0.86481, 0.5021, -0.392466, -0.461814, 0.795423, 1.05851, 1.22501, 1.67277)
 
 [node name="TextureCube" type="CSGBox3D" parent="SubViewportContainer/SubViewport/SliceVisualizer"]
+
+[node name="CSGSphere3D" type="CSGSphere3D" parent="SubViewportContainer/SubViewport/SliceVisualizer/TextureCube"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0)
+radius = 0.1
+material = SubResource("StandardMaterial3D_hpb36")
+
+[node name="CSGSphere3D2" type="CSGSphere3D" parent="SubViewportContainer/SubViewport/SliceVisualizer/TextureCube"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+radius = 0.1
+material = SubResource("StandardMaterial3D_qvde2")
+
+[node name="CSGSphere3D3" type="CSGSphere3D" parent="SubViewportContainer/SubViewport/SliceVisualizer/TextureCube"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.5)
+radius = 0.1
+material = SubResource("StandardMaterial3D_qa16k")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewportContainer/SubViewport/SliceVisualizer"]
 environment = SubResource("Environment_0bxk3")
