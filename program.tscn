@@ -10,6 +10,7 @@ shader_parameter/z_width = 16
 shader_parameter/z_offset = 0.5
 shader_parameter/rotation = Basis(1, 0, 0, 0, 1, 0, 0, 0, 1)
 shader_parameter/display_size = 0.5
+shader_parameter/mouse_position = null
 shader_parameter/image = ExtResource("2_yhju4")
 
 [node name="Program" type="Control"]
