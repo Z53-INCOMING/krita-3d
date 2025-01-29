@@ -13,12 +13,14 @@ var display_size := 0.5
 var z_offset := 0.5
 
 func _process(delta):
-	if Input.is_action_pressed("ui_down"):
+	if Input.is_action_pressed("rotate left"):
 		matrix = Basis.from_euler(Vector3(0.0, delta, 0.0) * 2.0) * matrix
-	if Input.is_action_pressed("ui_right"):
-		matrix = Basis.from_euler(Vector3(0.0, 0.0, delta) * 2.0) * matrix
-	if Input.is_action_pressed("ui_left"):
+	if Input.is_action_pressed("rotate right"):
+		matrix = Basis.from_euler(Vector3(0.0, -delta, 0.0) * 2.0) * matrix
+	if Input.is_action_pressed("rotate up"):
 		matrix = Basis.from_euler(Vector3(delta, 0.0, 0.0) * 2.0) * matrix
+	if Input.is_action_pressed("rotate down"):
+		matrix = Basis.from_euler(Vector3(-delta, 0.0, 0.0) * 2.0) * matrix
 	screen.material.set_shader_parameter("rotation", matrix)
 	texture_cube.basis = matrix
 	
