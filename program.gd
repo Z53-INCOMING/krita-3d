@@ -17,16 +17,21 @@ var z_offset := 0.5
 var image: Image
 
 # Max is 128
-var image_size := 128
+var image_size := 8
 
 var old_integer_mouse_coord: Vector2i
 
 var brush_color := Color.WHITE
 
+var past_images: Array[Image]
+
+var point_in_history := 0
+
 func _ready():
 	image = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
 	image.fill(Color.BLACK)
 	update_image()
+	past_images.append(image.duplicate(true))
 	screen.material.set_shader_parameter("z_width", image_size)
 
 func _process(delta):
@@ -75,9 +80,37 @@ func _process(delta):
 	if Input.is_action_pressed("paint"):
 		if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
 			color_pixel(mouse_position_3d, brush_color)
+			old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
 			update_image()
+	if Input.is_action_just_released("paint"):
+		point_in_history += 1
+		past_images.insert(point_in_history, image.duplicate(true)) # save in case of undo
+		while past_images.size() <= point_in_history:
+			past_images.remove_at(-1)
 	
-	old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
+	if past_images.size() > 16:
+		past_images.remove_at(0)
+		point_in_history -= 1
+	
+	if Input.is_action_just_pressed("undo") and !Input.is_action_pressed("shift"):
+		if !past_images.is_empty():
+			point_in_history -= 1
+			if point_in_history > -1:
+				image = past_images[point_in_history]
+				update_image()
+			else:
+				point_in_history = 0
+	
+	if Input.is_action_just_pressed("redo"):
+		if !past_images.is_empty():
+			point_in_history += 1
+			if point_in_history < past_images.size():
+				image = past_images[point_in_history]
+				update_image()
+			else:
+				point_in_history = past_images.size() - 1
+				image = past_images[-1]
+				update_image()
 
 func color_pixel(mouse_position_3d: Vector3, color: Color) -> void:
 	image.set_pixelv(calculate_integer_mouse_coordinate(mouse_position_3d), color)
