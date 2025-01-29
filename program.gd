@@ -6,13 +6,31 @@ extends Control
 
 @onready var intersection_plane = $SubViewportContainer/SubViewport/SliceVisualizer/IntersectionPlane
 
+@onready var label = $Label
+
 var matrix := Basis.IDENTITY
 
 var display_size := 0.5
 
 var z_offset := 0.5
 
+var image: Image
+
+var image_size := 64
+
+var old_integer_mouse_coord: Vector2i
+
+var brush_color := Color.WHITE
+
+func _ready():
+	image = Image.create(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
+	image.fill(Color.BLACK)
+	update_image()
+	screen.material.set_shader_parameter("z_width", image_size)
+
 func _process(delta):
+	label.text = str(Engine.get_frames_per_second())
+	
 	if Input.is_action_pressed("rotate left"):
 		matrix = Basis.from_euler(Vector3(0.0, delta, 0.0) * 2.0) * matrix
 	if Input.is_action_pressed("rotate right"):
@@ -44,3 +62,21 @@ func _process(delta):
 	z_offset = clampf(z_offset, 0.0, 0.99)
 	screen.material.set_shader_parameter("z_offset", z_offset)
 	intersection_plane.position.z = z_offset - 0.5
+	
+	if Input.is_action_pressed("paint"):
+		if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
+			color_pixel(mouse_position_3d, brush_color)
+			update_image()
+	
+	old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
+
+func color_pixel(mouse_position_3d: Vector3, color: Color) -> void:
+	image.set_pixelv(calculate_integer_mouse_coordinate(mouse_position_3d), color)
+
+func calculate_integer_mouse_coordinate(mouse_position_3d: Vector3) -> Vector2i:
+	return Vector2i(int(mouse_position_3d.x * image_size), int(mouse_position_3d.y * image_size) + (int(mouse_position_3d.z * image_size) * image_size))
+
+func update_image():
+	var texture = ImageTexture.create_from_image(image)
+	
+	screen.material.set_shader_parameter("image", texture)

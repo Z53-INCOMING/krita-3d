@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://program.gd" id="1_5rvem"]
 [ext_resource type="Shader" path="res://3d image visualizer.gdshader" id="1_xyavc"]
 [ext_resource type="Shader" path="res://program.gdshader" id="2_1yiai"]
-[ext_resource type="Texture2D" uid="uid://ccp83gw7wd8rl" path="res://3DStone.png" id="2_yhju4"]
+[ext_resource type="Texture2D" uid="uid://b44cvhtdkeykp" path="res://oak top 3d.png" id="4_k8oem"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h7wj0"]
 shader = ExtResource("2_1yiai")
@@ -15,7 +15,7 @@ shader_parameter/z_offset = 0.5
 shader_parameter/rotation = Basis(1, 0, 0, 0, 1, 0, 0, 0, 1)
 shader_parameter/display_size = 0.5
 shader_parameter/mouse_position = null
-shader_parameter/image = ExtResource("2_yhju4")
+shader_parameter/image = ExtResource("4_k8oem")
 
 [sub_resource type="Environment" id="Environment_0bxk3"]
 background_mode = 1
@@ -41,7 +41,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_5rvem")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="Background" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_h7wj0")
 layout_mode = 0
 offset_right = 2573.0
@@ -87,3 +87,8 @@ light_negative = true
 
 [node name="IntersectionPlane" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/SliceVisualizer"]
 mesh = SubResource("QuadMesh_7oevu")
+
+[node name="Label" type="Label" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 23.0
