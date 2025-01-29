@@ -16,14 +16,15 @@ var z_offset := 0.5
 
 var image: Image
 
-var image_size := 64
+# Max is 128
+var image_size := 128
 
 var old_integer_mouse_coord: Vector2i
 
 var brush_color := Color.WHITE
 
 func _ready():
-	image = Image.create(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
+	image = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
 	image.fill(Color.BLACK)
 	update_image()
 	screen.material.set_shader_parameter("z_width", image_size)
@@ -39,6 +40,14 @@ func _process(delta):
 		matrix = Basis.from_euler(Vector3(delta, 0.0, 0.0) * 2.0) * matrix
 	if Input.is_action_pressed("rotate down"):
 		matrix = Basis.from_euler(Vector3(-delta, 0.0, 0.0) * 2.0) * matrix
+	
+	if Input.is_action_just_pressed("z axis"):
+		matrix = Basis.IDENTITY
+	if Input.is_action_just_pressed("x axis"):
+		matrix = Basis.from_euler(Vector3(0.0, PI * 0.5, 0.0))
+	if Input.is_action_just_pressed("y axis"):
+		matrix = Basis.from_euler(Vector3(PI * 0.5, 0.0, 0.0))
+	
 	screen.material.set_shader_parameter("rotation", matrix)
 	texture_cube.basis = matrix
 	
@@ -56,9 +65,9 @@ func _process(delta):
 	screen.material.set_shader_parameter("mouse_position", mouse_position_3d)
 	
 	if Input.is_action_just_released("scroll_down"):
-		z_offset -= 1.0 / 32.0
+		z_offset -= 1.0 / float(image_size)
 	if Input.is_action_just_released("scroll_up"):
-		z_offset += 1.0 / 32.0
+		z_offset += 1.0 / float(image_size)
 	z_offset = clampf(z_offset, 0.0, 0.99)
 	screen.material.set_shader_parameter("z_offset", z_offset)
 	intersection_plane.position.z = z_offset - 0.5
