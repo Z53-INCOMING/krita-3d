@@ -4,7 +4,7 @@ uniform sampler2D image: filter_nearest;
 
 uniform int z_width = 16;
 
-uniform float z_offset : hint_range(0.0, 0.9375) = 0.0;
+uniform float z_offset : hint_range(0.0, 1.0) = 0.0;
 
 uniform mat3 rotation;
 

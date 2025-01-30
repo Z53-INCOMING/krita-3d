@@ -16,8 +16,8 @@ var z_offset := 0.5
 
 var image: Image
 
-# Max is 128
-var image_size := 64
+# Max is 128, works better with powers of two
+var image_size := 50
 
 var old_integer_mouse_coord: Vector2i
 
@@ -28,7 +28,7 @@ var past_images: Array[Image]
 var point_in_history := 0
 
 func _ready():
-	if true:
+	if false:
 		load_image("res://3DStone.png")
 	else:
 		image = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
@@ -84,7 +84,7 @@ func _process(delta):
 		z_offset -= 1.0 / float(image_size)
 	if Input.is_action_just_released("scroll_up"):
 		z_offset += 1.0 / float(image_size)
-	z_offset = clampf(z_offset, 0.0, 0.99)
+	z_offset = clampf(z_offset, 0.0, float(image_size - 1) / float(image_size))
 	screen.material.set_shader_parameter("z_offset", z_offset)
 	intersection_plane.position.z = z_offset - 0.5
 	
