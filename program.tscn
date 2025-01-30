@@ -7,13 +7,14 @@
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h7wj0"]
 shader = ExtResource("2_1yiai")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_tj7fs"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_dts6o"]
 shader = ExtResource("1_xyavc")
 shader_parameter/z_width = 16
 shader_parameter/z_offset = 0.5
 shader_parameter/rotation = Basis(1, 0, 0, 0, 1, 0, 0, 0, 1)
 shader_parameter/display_size = 0.5
 shader_parameter/mouse_position = null
+shader_parameter/modulate = Vector4(1, 1, 1, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hpb36"]
 albedo_color = Color(1, 0, 0, 1)
@@ -57,7 +58,7 @@ color = Color(0.0926804, 0.0926804, 0.0926804, 1)
 
 [node name="Screen" type="ColorRect" parent="."]
 texture_filter = 1
-material = SubResource("ShaderMaterial_tj7fs")
+material = SubResource("ShaderMaterial_dts6o")
 layout_mode = 0
 offset_right = 2560.0
 offset_bottom = 1440.0

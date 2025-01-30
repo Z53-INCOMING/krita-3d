@@ -12,6 +12,8 @@ uniform float display_size = 0.5;
 
 uniform vec3 mouse_position;
 
+uniform vec4 modulate = vec4(1.0);
+
 void fragment() {
 	vec2 cropped_UV = UV * (vec2(16.0, 9.0) / 9.0);
 	cropped_UV *= vec2(1.0 / display_size);
@@ -30,7 +32,7 @@ void fragment() {
 		vec2 scaled_2d_pos = pixel_pos.xy / vec2(1.0, float_z_width);
 		float offset_from_z_axis = floor(pixel_pos.z * float_z_width) / float_z_width;
 		
-		COLOR = texture(image, scaled_2d_pos + vec2(0.0, offset_from_z_axis));
+		COLOR = texture(image, scaled_2d_pos + vec2(0.0, offset_from_z_axis)) * modulate;
 		if (floor(mouse_position * float_z_width) / float_z_width == floor(pixel_pos * float_z_width) / float_z_width) {
 			COLOR = vec4(1.0);
 		}

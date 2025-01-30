@@ -17,7 +17,7 @@ var z_offset := 0.5
 var image: Image
 
 # Max is 128
-var image_size := 8
+var image_size := 64
 
 var old_integer_mouse_coord: Vector2i
 
@@ -28,9 +28,20 @@ var past_images: Array[Image]
 var point_in_history := 0
 
 func _ready():
-	image = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
-	image.fill(Color.BLACK)
+	if true:
+		load_image("res://3DStone.png")
+	else:
+		image = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
+		image.fill(Color.BLACK)
+		update_image()
+		past_images.append(image.duplicate(true))
+		screen.material.set_shader_parameter("z_width", image_size)
+
+func load_image(path: String) -> void:
+	image = Image.load_from_file(path)
+	image_size = image.get_width()
 	update_image()
+	past_images.clear()
 	past_images.append(image.duplicate(true))
 	screen.material.set_shader_parameter("z_width", image_size)
 
@@ -46,11 +57,11 @@ func _process(delta):
 	if Input.is_action_pressed("rotate down"):
 		matrix = Basis.from_euler(Vector3(-delta, 0.0, 0.0) * 2.0) * matrix
 	
-	if Input.is_action_just_pressed("z axis"):
+	if Input.is_action_just_pressed("z axis") and !Input.is_action_pressed("undo"):
 		matrix = Basis.IDENTITY
 	if Input.is_action_just_pressed("x axis"):
 		matrix = Basis.from_euler(Vector3(0.0, -PI * 0.5, 0.0))
-	if Input.is_action_just_pressed("y axis"):
+	if Input.is_action_just_pressed("y axis") and !Input.is_action_pressed("redo"):
 		matrix = Basis.from_euler(Vector3(PI * 0.5, 0.0, 0.0))
 	
 	screen.material.set_shader_parameter("rotation", matrix)
@@ -82,7 +93,12 @@ func _process(delta):
 			color_pixel(mouse_position_3d, brush_color)
 			old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
 			update_image()
-	if Input.is_action_just_released("paint"):
+	if Input.is_action_pressed("erase"):
+		if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
+			color_pixel(mouse_position_3d, Color.BLACK)
+			old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
+			update_image()
+	if Input.is_action_just_released("paint") or Input.is_action_just_released("erase"):
 		past_images.append(image.duplicate(true)) # save in case of undo
 		while past_images.size() > point_in_history + 2:
 			past_images.remove_at(point_in_history + 1)
@@ -111,6 +127,13 @@ func _process(delta):
 				point_in_history = past_images.size() - 1
 				image = past_images[-1].duplicate(true)
 				update_image()
+	
+	if Input.is_action_just_pressed("export"):
+		export_project()
+
+func export_project() -> void:
+	var id := randi() % 4096
+	image.save_png("user://" + str(id) + ".png")
 
 func color_pixel(mouse_position_3d: Vector3, color: Color) -> void:
 	image.set_pixelv(calculate_integer_mouse_coordinate(mouse_position_3d), color)
