@@ -83,10 +83,10 @@ func _process(delta):
 			old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
 			update_image()
 	if Input.is_action_just_released("paint"):
-		point_in_history += 1
-		past_images.insert(point_in_history, image.duplicate(true)) # save in case of undo
-		while past_images.size() <= point_in_history:
-			past_images.remove_at(-1)
+		past_images.append(image.duplicate(true)) # save in case of undo
+		while past_images.size() > point_in_history + 2:
+			past_images.remove_at(point_in_history + 1)
+		point_in_history = past_images.size() - 1
 	
 	if past_images.size() > 16:
 		past_images.remove_at(0)
@@ -96,7 +96,7 @@ func _process(delta):
 		if !past_images.is_empty():
 			point_in_history -= 1
 			if point_in_history > -1:
-				image = past_images[point_in_history]
+				image = past_images[point_in_history].duplicate(true)
 				update_image()
 			else:
 				point_in_history = 0
@@ -105,11 +105,11 @@ func _process(delta):
 		if !past_images.is_empty():
 			point_in_history += 1
 			if point_in_history < past_images.size():
-				image = past_images[point_in_history]
+				image = past_images[point_in_history].duplicate(true)
 				update_image()
 			else:
 				point_in_history = past_images.size() - 1
-				image = past_images[-1]
+				image = past_images[-1].duplicate(true)
 				update_image()
 
 func color_pixel(mouse_position_3d: Vector3, color: Color) -> void:
