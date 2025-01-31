@@ -8,6 +8,10 @@ extends Control
 
 @onready var label = $Label
 
+@onready var volume = $SubViewportContainer2/SubViewport/VolumetricTextureViewer/VolumetricTexture
+
+@onready var volume_camera = $SubViewportContainer2/SubViewport/VolumetricTextureViewer/Pivot
+
 var matrix := Basis.IDENTITY
 
 var display_size := 0.5
@@ -17,7 +21,7 @@ var z_offset := 0.5
 var image: Image
 
 # Max is 128, works better with powers of two
-var image_size := 50
+var image_size := 32
 
 var old_integer_mouse_coord: Vector2i
 
@@ -27,31 +31,49 @@ var past_images: Array[Image]
 
 var point_in_history := 0
 
+var volumetric_shader: ShaderMaterial
+
 func _ready():
 	if false:
-		load_image("res://3DStone.png")
+		load_image(Image.load_from_file(""))
 	else:
-		image = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
-		image.fill(Color.BLACK)
-		update_image()
-		past_images.append(image.duplicate(true))
-		screen.material.set_shader_parameter("z_width", image_size)
+		var empty = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
+		empty.fill(Color.BLACK)
+		
+		load_image(empty)
 
-func load_image(path: String) -> void:
-	image = Image.load_from_file(path)
+func load_image(to_load: Image) -> void:
+	image = to_load.duplicate(true)
 	image_size = image.get_width()
-	update_image()
-	past_images.clear()
 	past_images.append(image.duplicate(true))
 	screen.material.set_shader_parameter("z_width", image_size)
+	
+	var placeholder = PlaceholderTexture2D.new()
+	placeholder.size = Vector2(image_size, image_size)
+	volumetric_shader = ShaderMaterial.new()
+	volumetric_shader.shader = load("res://volumetric slice.gdshader")
+	volumetric_shader.set_shader_parameter("image_size", image_size)
+	for i in image_size:
+		var sprite = Sprite3D.new()
+		
+		sprite.texture = placeholder
+		sprite.pixel_size = 2.0 / float(image_size)
+		sprite.material_override = volumetric_shader
+		sprite.position.z = (float(i) / float(image_size)) * 2.0 - 1.0
+		
+		volume.add_child(sprite)
+	
+	update_image()
 
 func _process(delta):
 	label.text = str(Engine.get_frames_per_second())
 	
+	volume_camera.rotation.y = sin(float(Time.get_ticks_msec()) / 250.0) * 0.125
+	
 	if Input.is_action_pressed("rotate left"):
-		matrix = Basis.from_euler(Vector3(0.0, delta, 0.0) * 2.0) * matrix
-	if Input.is_action_pressed("rotate right"):
 		matrix = Basis.from_euler(Vector3(0.0, -delta, 0.0) * 2.0) * matrix
+	if Input.is_action_pressed("rotate right"):
+		matrix = Basis.from_euler(Vector3(0.0, delta, 0.0) * 2.0) * matrix
 	if Input.is_action_pressed("rotate up"):
 		matrix = Basis.from_euler(Vector3(delta, 0.0, 0.0) * 2.0) * matrix
 	if Input.is_action_pressed("rotate down"):
@@ -145,3 +167,4 @@ func update_image():
 	var texture = ImageTexture.create_from_image(image)
 	
 	screen.material.set_shader_parameter("image", texture)
+	volumetric_shader.set_shader_parameter("image", texture)

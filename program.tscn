@@ -65,9 +65,10 @@ offset_bottom = 1440.0
 
 [node name="SubViewportContainer" type="SubViewportContainer" parent="."]
 layout_mode = 0
-offset_top = 928.0
+offset_top = 1440.0
 offset_right = 513.0
-offset_bottom = 1459.0
+offset_bottom = 1971.0
+scale = Vector2(1, -1)
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer"]
 transparent_bg = true
@@ -78,7 +79,7 @@ render_target_update_mode = 4
 [node name="SliceVisualizer" type="Node3D" parent="SubViewportContainer/SubViewport"]
 
 [node name="Camera3D" type="Camera3D" parent="SubViewportContainer/SubViewport/SliceVisualizer"]
-transform = Transform3D(0.919767, -0.197057, 0.339408, 0, 0.86481, 0.5021, -0.392466, -0.461814, 0.795423, 1.05851, 1.22501, 1.67277)
+transform = Transform3D(0.919822, 0.196761, 0.339431, 0, 0.865151, -0.501511, -0.392337, 0.4613, 0.795785, 1.059, -1.225, 1.673)
 
 [node name="TextureCube" type="CSGBox3D" parent="SubViewportContainer/SubViewport/SliceVisualizer"]
 
@@ -88,7 +89,7 @@ radius = 0.1
 material = SubResource("StandardMaterial3D_hpb36")
 
 [node name="CSGSphere3D2" type="CSGSphere3D" parent="SubViewportContainer/SubViewport/SliceVisualizer/TextureCube"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 radius = 0.1
 material = SubResource("StandardMaterial3D_qvde2")
 
@@ -110,6 +111,33 @@ light_negative = true
 
 [node name="IntersectionPlane" type="MeshInstance3D" parent="SubViewportContainer/SubViewport/SliceVisualizer"]
 mesh = SubResource("QuadMesh_7oevu")
+
+[node name="SubViewportContainer2" type="SubViewportContainer" parent="."]
+layout_mode = 0
+offset_left = 1737.0
+offset_top = 221.0
+offset_right = 2761.0
+offset_bottom = 1245.0
+
+[node name="SubViewport" type="SubViewport" parent="SubViewportContainer2"]
+transparent_bg = true
+handle_input_locally = false
+msaa_3d = 3
+size = Vector2i(1024, 1024)
+render_target_update_mode = 4
+
+[node name="VolumetricTextureViewer" type="Node3D" parent="SubViewportContainer2/SubViewport"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
+
+[node name="VolumetricTexture" type="Node3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
+environment = SubResource("Environment_0bxk3")
+
+[node name="Pivot" type="Node3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
+
+[node name="Camera3D" type="Camera3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer/Pivot"]
+transform = Transform3D(0.919767, -0.197057, 0.339408, 0, 0.86481, 0.502099, -0.392466, -0.461814, 0.795423, 1.34502, 1.43075, 2.28693)
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
