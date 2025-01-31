@@ -21,7 +21,7 @@ var z_offset := 0.5
 var image: Image
 
 # Max is 128, works better with powers of two
-var image_size := 64
+var image_size := 32
 
 var old_integer_mouse_coord: Vector2i
 
@@ -34,8 +34,8 @@ var point_in_history := 0
 var volumetric_shader: ShaderMaterial
 
 func _ready():
-	if true:
-		load_image(Image.load_from_file("res://stick figure.png"))
+	if false:
+		load_image(Image.load_from_file("res://3DStone.png"))
 	else:
 		var empty = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
 		empty.fill(Color.BLACK)
@@ -123,21 +123,22 @@ func _process(delta):
 	screen.material.set_shader_parameter("z_offset", z_offset + (1.0 / 1000.0))
 	intersection_plane.position.z = z_offset - 0.5
 	
-	if Input.is_action_pressed("paint"):
-		if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
-			color_pixel(mouse_position_3d, brush_color)
-			old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
-			update_image()
-	if Input.is_action_pressed("erase"):
-		if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
-			color_pixel(mouse_position_3d, Color.BLACK)
-			old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
-			update_image()
-	if Input.is_action_just_released("paint") or Input.is_action_just_released("erase"):
-		past_images.append(image.duplicate(true)) # save in case of undo
-		while past_images.size() > point_in_history + 2:
-			past_images.remove_at(point_in_history + 1)
-		point_in_history = past_images.size() - 1
+	if AABB(Vector3.ZERO, Vector3.ONE).has_point(mouse_position_3d):
+		if Input.is_action_pressed("paint"):
+			if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
+				color_pixel(mouse_position_3d, brush_color)
+				old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
+				update_image()
+		if Input.is_action_pressed("erase"):
+			if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
+				color_pixel(mouse_position_3d, Color.BLACK)
+				old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
+				update_image()
+		if Input.is_action_just_released("paint") or Input.is_action_just_released("erase"):
+			past_images.append(image.duplicate(true)) # save in case of undo
+			while past_images.size() > point_in_history + 2:
+				past_images.remove_at(point_in_history + 1)
+			point_in_history = past_images.size() - 1
 	
 	if past_images.size() > 16:
 		past_images.remove_at(0)
@@ -183,3 +184,7 @@ func update_image():
 	
 	screen.material.set_shader_parameter("image", texture)
 	volumetric_shader.set_shader_parameter("image", texture)
+
+
+func _on_color_picker_button_color_changed(color):
+	brush_color = color

@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://bx6yxqrt4mq0v"]
+[gd_scene load_steps=14 format=3 uid="uid://bx6yxqrt4mq0v"]
 
 [ext_resource type="Script" path="res://program.gd" id="1_5rvem"]
 [ext_resource type="Shader" path="res://3d image visualizer.gdshader" id="1_xyavc"]
@@ -39,6 +39,11 @@ albedo_color = Color(0, 0.666667, 1, 0.529412)
 [sub_resource type="QuadMesh" id="QuadMesh_7oevu"]
 material = SubResource("StandardMaterial3D_b541f")
 size = Vector2(2, 2)
+
+[sub_resource type="Environment" id="Environment_370gd"]
+
+[sub_resource type="World3D" id="World3D_vcce8"]
+environment = SubResource("Environment_370gd")
 
 [node name="Program" type="Control"]
 layout_mode = 3
@@ -115,11 +120,13 @@ mesh = SubResource("QuadMesh_7oevu")
 [node name="SubViewportContainer2" type="SubViewportContainer" parent="."]
 layout_mode = 0
 offset_left = 1536.0
-offset_top = 208.0
+offset_top = 149.0
 offset_right = 2560.0
-offset_bottom = 1232.0
+offset_bottom = 1173.0
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer2"]
+own_world_3d = true
+world_3d = SubResource("World3D_vcce8")
 transparent_bg = true
 handle_input_locally = false
 msaa_3d = 3
@@ -131,15 +138,19 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
 
 [node name="VolumetricTexture" type="Node3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
-environment = SubResource("Environment_0bxk3")
-
 [node name="Pivot" type="Node3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
 
 [node name="Camera3D" type="Camera3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer/Pivot"]
-transform = Transform3D(1, 0, 0, 0, 0.912777, 0.408458, 0, -0.408458, 0.912777, 0, 1, 2.5)
+transform = Transform3D(1, 0, 0, 0, 0.912777, 0.408458, 0, -0.408458, 0.912777, 0, 1.25, 2.5)
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
 offset_right = 40.0
 offset_bottom = 23.0
+
+[node name="ColorPickerButton" type="ColorPicker" parent="."]
+layout_mode = 0
+offset_right = 512.0
+offset_bottom = 576.0
+
+[connection signal="color_changed" from="ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]
