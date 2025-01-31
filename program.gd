@@ -21,7 +21,7 @@ var z_offset := 0.5
 var image: Image
 
 # Max is 128, works better with powers of two
-var image_size := 32
+var image_size := 16
 
 var old_integer_mouse_coord: Vector2i
 
@@ -34,8 +34,8 @@ var point_in_history := 0
 var volumetric_shader: ShaderMaterial
 
 func _ready():
-	if false:
-		load_image(Image.load_from_file(""))
+	if true:
+		load_image(Image.load_from_file("res://stick figure.png"))
 	else:
 		var empty = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
 		empty.fill(Color.BLACK)
@@ -68,7 +68,20 @@ func load_image(to_load: Image) -> void:
 func _process(delta):
 	label.text = str(Engine.get_frames_per_second())
 	
-	volume_camera.rotation.y = sin(float(Time.get_ticks_msec()) / 250.0) * 0.125
+	volume_camera.rotation.y = sin(float(Time.get_ticks_msec()) / 500.0) * PI * 0.125 - (PI * 0.125)
+	
+	if Input.is_action_pressed("cam forward"):
+		volume_camera.scale -= Vector3.ONE * 0.25 * delta
+	if Input.is_action_pressed("cam backward"):
+		volume_camera.scale += Vector3.ONE * 0.25 * delta
+	if Input.is_action_pressed("cam left"):
+		volume_camera.position.x -= 0.25 * delta
+	if Input.is_action_pressed("cam right"):
+		volume_camera.position.x += 0.25 * delta
+	if Input.is_action_pressed("cam down"):
+		volume_camera.position.y -= 0.25 * delta
+	if Input.is_action_pressed("cam up"):
+		volume_camera.position.y += 0.25 * delta
 	
 	if Input.is_action_pressed("rotate left"):
 		matrix = Basis.from_euler(Vector3(0.0, -delta, 0.0) * 2.0) * matrix
@@ -107,7 +120,7 @@ func _process(delta):
 	if Input.is_action_just_released("scroll_up"):
 		z_offset += 1.0 / float(image_size)
 	z_offset = clampf(z_offset, 0.0, float(image_size - 1) / float(image_size))
-	screen.material.set_shader_parameter("z_offset", z_offset)
+	screen.material.set_shader_parameter("z_offset", z_offset + (1.0 / 1000.0))
 	intersection_plane.position.z = z_offset - 0.5
 	
 	if Input.is_action_pressed("paint"):
@@ -161,7 +174,9 @@ func color_pixel(mouse_position_3d: Vector3, color: Color) -> void:
 	image.set_pixelv(calculate_integer_mouse_coordinate(mouse_position_3d), color)
 
 func calculate_integer_mouse_coordinate(mouse_position_3d: Vector3) -> Vector2i:
-	return Vector2i(int(mouse_position_3d.x * image_size), int(mouse_position_3d.y * image_size) + (int(mouse_position_3d.z * image_size) * image_size))
+	var pixel_3d = Vector3i(floor(mouse_position_3d * float(image_size)))
+	return Vector2i(pixel_3d.x, pixel_3d.y + (pixel_3d.z * image_size))
+	#return Vector2i(int(mouse_position_3d.x * image_size), int(mouse_position_3d.y * image_size) + (int(mouse_position_3d.z * image_size) * image_size))
 
 func update_image():
 	var texture = ImageTexture.create_from_image(image)
