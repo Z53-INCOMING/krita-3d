@@ -21,7 +21,7 @@ var z_offset := 0.5
 var image: Image
 
 # Max is 128, works better with powers of two
-var image_size := 32
+var image_size := 64
 
 var old_integer_mouse_coord: Vector2i
 
@@ -32,6 +32,8 @@ var past_images: Array[Image]
 var point_in_history := 0
 
 var volumetric_shader: ShaderMaterial
+
+var brush_radius := 4.0
 
 func _ready():
 	if false:
@@ -125,9 +127,16 @@ func _process(delta):
 	
 	if AABB(Vector3.ZERO, Vector3.ONE).has_point(mouse_position_3d):
 		if Input.is_action_pressed("paint"):
-			if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
-				color_pixel(mouse_position_3d, brush_color)
-				old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
+			var current_integer_mouse_coord := calculate_integer_mouse_coordinate(mouse_position_3d)
+			var selected_pixel_3d = Vector3i(floor(mouse_position_3d * float(image_size)))
+			if old_integer_mouse_coord != current_integer_mouse_coord:
+				for x in range(selected_pixel_3d.x - int(ceil(brush_radius)), selected_pixel_3d.x + int(ceil(brush_radius) + 1)):
+					for y in range(selected_pixel_3d.y - int(ceil(brush_radius)), selected_pixel_3d.y + int(ceil(brush_radius) + 1)):
+						for z in range(selected_pixel_3d.z - int(ceil(brush_radius)), selected_pixel_3d.z + int(ceil(brush_radius) + 1)):
+							if Vector3(x, y, z).distance_squared_to(Vector3(selected_pixel_3d)) < brush_radius * brush_radius:
+								color_pixel(Vector3(x, y, z) / float(image_size), brush_color)
+				
+				old_integer_mouse_coord = current_integer_mouse_coord
 				update_image()
 		if Input.is_action_pressed("erase"):
 			if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
