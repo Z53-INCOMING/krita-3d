@@ -114,10 +114,10 @@ mesh = SubResource("QuadMesh_7oevu")
 
 [node name="SubViewportContainer2" type="SubViewportContainer" parent="."]
 layout_mode = 0
-offset_left = 1737.0
-offset_top = 221.0
-offset_right = 2761.0
-offset_bottom = 1245.0
+offset_left = 1536.0
+offset_top = 208.0
+offset_right = 2560.0
+offset_bottom = 1232.0
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer2"]
 transparent_bg = true
@@ -137,7 +137,7 @@ environment = SubResource("Environment_0bxk3")
 [node name="Pivot" type="Node3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
 
 [node name="Camera3D" type="Camera3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer/Pivot"]
-transform = Transform3D(1, 0, 0, 0, 0.906308, 0.422618, 0, -0.422618, 0.906308, 0, 1, 2.5)
+transform = Transform3D(1, 0, 0, 0, 0.912777, 0.408458, 0, -0.408458, 0.912777, 0, 1, 2.5)
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0

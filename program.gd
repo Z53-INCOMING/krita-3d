@@ -21,7 +21,7 @@ var z_offset := 0.5
 var image: Image
 
 # Max is 128, works better with powers of two
-var image_size := 16
+var image_size := 64
 
 var old_integer_mouse_coord: Vector2i
 
@@ -68,7 +68,7 @@ func load_image(to_load: Image) -> void:
 func _process(delta):
 	label.text = str(Engine.get_frames_per_second())
 	
-	volume_camera.rotation.y = sin(float(Time.get_ticks_msec()) / 500.0) * PI * 0.125 - (PI * 0.125)
+	volume_camera.rotation.y = sin(float(Time.get_ticks_msec()) / 500.0) * PI * 0.125
 	
 	if Input.is_action_pressed("cam forward"):
 		volume_camera.scale -= Vector3.ONE * 0.25 * delta
@@ -106,7 +106,7 @@ func _process(delta):
 	mouse_position_2d *= Vector2(16.0, 9.0) / 9.0
 	mouse_position_2d *= 1.0 / display_size
 	mouse_position_2d -= Vector2(16.0 / 9.0 * (1.0 / (display_size * 2.0)), (1.0 / (display_size * 2.0)))
-	mouse_position_2d += Vector2(0.5, 0.5)
+	mouse_position_2d += Vector2(1.0, 0.5)
 	
 	var mouse_position_3d := Vector3(mouse_position_2d.x, mouse_position_2d.y, z_offset)
 	mouse_position_3d -= Vector3.ONE * 0.5

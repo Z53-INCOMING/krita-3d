@@ -18,7 +18,7 @@ void fragment() {
 	vec2 cropped_UV = UV * (vec2(16.0, 9.0) / 9.0);
 	cropped_UV *= vec2(1.0 / display_size);
 	cropped_UV -= vec2(16.0 / 9.0 * (1.0 / (display_size * 2.0)), (1.0 / (display_size * 2.0)));
-	cropped_UV += vec2(0.5);
+	cropped_UV += vec2(1.0, 0.5);
 	
 	vec3 pixel_pos = vec3(cropped_UV, z_offset);
 	
