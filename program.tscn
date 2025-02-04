@@ -154,4 +154,16 @@ offset_top = 28.0
 offset_right = 512.0
 offset_bottom = 604.0
 
+[node name="HSlider" type="HSlider" parent="."]
+layout_mode = 0
+offset_left = 4.0
+offset_top = 602.0
+offset_right = 512.0
+offset_bottom = 645.0
+min_value = 1.0
+max_value = 8.0
+step = 0.25
+value = 1.0
+
 [connection signal="color_changed" from="ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]
+[connection signal="value_changed" from="HSlider" to="." method="_on_h_slider_value_changed"]

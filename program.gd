@@ -21,7 +21,7 @@ var z_offset := 0.5
 var image: Image
 
 # Max is 128, works better with powers of two
-var image_size := 64
+var image_size := 32
 
 var old_integer_mouse_coord: Vector2i
 
@@ -33,11 +33,15 @@ var point_in_history := 0
 
 var volumetric_shader: ShaderMaterial
 
-var brush_radius := 4.0
+var brush_radius := 0.0
+
+var drag_start: Vector3
+
+var volume_cam_speed := 1.0
 
 func _ready():
-	if false:
-		load_image(Image.load_from_file("res://3DStone.png"))
+	if true:
+		load_image(Image.load_from_file("user://4d stick figure.png"))
 	else:
 		var empty = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
 		empty.fill(Color.BLACK)
@@ -70,20 +74,20 @@ func load_image(to_load: Image) -> void:
 func _process(delta):
 	label.text = str(Engine.get_frames_per_second())
 	
-	volume_camera.rotation.y = sin(float(Time.get_ticks_msec()) / 500.0) * PI * 0.125
+	volume_camera.rotation.y = sin(float(Time.get_ticks_msec()) / 500.0) * 0.125
 	
 	if Input.is_action_pressed("cam forward"):
-		volume_camera.scale -= Vector3.ONE * 0.25 * delta
+		volume_camera.position.z -= volume_cam_speed * delta
 	if Input.is_action_pressed("cam backward"):
-		volume_camera.scale += Vector3.ONE * 0.25 * delta
+		volume_camera.position.z += volume_cam_speed * delta
 	if Input.is_action_pressed("cam left"):
-		volume_camera.position.x -= 0.25 * delta
+		volume_camera.position.x -= volume_cam_speed * delta
 	if Input.is_action_pressed("cam right"):
-		volume_camera.position.x += 0.25 * delta
+		volume_camera.position.x += volume_cam_speed * delta
 	if Input.is_action_pressed("cam down"):
-		volume_camera.position.y -= 0.25 * delta
+		volume_camera.position.y -= volume_cam_speed * delta
 	if Input.is_action_pressed("cam up"):
-		volume_camera.position.y += 0.25 * delta
+		volume_camera.position.y += volume_cam_speed * delta
 	
 	if Input.is_action_pressed("rotate left"):
 		matrix = Basis.from_euler(Vector3(0.0, -delta, 0.0) * 2.0) * matrix
@@ -118,36 +122,34 @@ func _process(delta):
 	screen.material.set_shader_parameter("mouse_position", mouse_position_3d)
 	
 	if Input.is_action_just_released("scroll_down"):
-		z_offset -= 1.0 / float(image_size)
+		if Input.is_action_pressed("shift"):
+			z_offset -= 1.0 / 8.0
+		else:
+			z_offset -= 1.0 / float(image_size)
 	if Input.is_action_just_released("scroll_up"):
-		z_offset += 1.0 / float(image_size)
+		if Input.is_action_pressed("shift"):
+			z_offset += 1.0 / 8.0
+		else:
+			z_offset += 1.0 / float(image_size)
 	z_offset = clampf(z_offset, 0.0, float(image_size - 1) / float(image_size))
 	screen.material.set_shader_parameter("z_offset", z_offset + (1.0 / 1000.0))
 	intersection_plane.position.z = z_offset - 0.5
 	
 	if AABB(Vector3.ZERO, Vector3.ONE).has_point(mouse_position_3d):
+		#if Input.is_action_just_pressed("paint"):
+			#drag_start = mouse_position_3d
+		#if Input.is_action_just_released("paint"):
+			#sphere(drag_start, mouse_position_3d, brush_color)
 		if Input.is_action_pressed("paint"):
-			var current_integer_mouse_coord := calculate_integer_mouse_coordinate(mouse_position_3d)
-			var selected_pixel_3d = Vector3i(floor(mouse_position_3d * float(image_size)))
-			if old_integer_mouse_coord != current_integer_mouse_coord:
-				for x in range(selected_pixel_3d.x - int(ceil(brush_radius)), selected_pixel_3d.x + int(ceil(brush_radius) + 1)):
-					for y in range(selected_pixel_3d.y - int(ceil(brush_radius)), selected_pixel_3d.y + int(ceil(brush_radius) + 1)):
-						for z in range(selected_pixel_3d.z - int(ceil(brush_radius)), selected_pixel_3d.z + int(ceil(brush_radius) + 1)):
-							if Vector3(x, y, z).distance_squared_to(Vector3(selected_pixel_3d)) < brush_radius * brush_radius:
-								color_pixel(Vector3(x, y, z) / float(image_size), brush_color)
-				
-				old_integer_mouse_coord = current_integer_mouse_coord
-				update_image()
+			brush(mouse_position_3d, brush_color)
 		if Input.is_action_pressed("erase"):
-			if old_integer_mouse_coord != calculate_integer_mouse_coordinate(mouse_position_3d):
-				color_pixel(mouse_position_3d, Color.BLACK)
-				old_integer_mouse_coord = calculate_integer_mouse_coordinate(mouse_position_3d)
-				update_image()
+			brush(mouse_position_3d, Color.BLACK)
 		if Input.is_action_just_released("paint") or Input.is_action_just_released("erase"):
 			past_images.append(image.duplicate(true)) # save in case of undo
 			while past_images.size() > point_in_history + 2:
 				past_images.remove_at(point_in_history + 1)
 			point_in_history = past_images.size() - 1
+			old_integer_mouse_coord = -Vector2i.ONE
 	
 	if past_images.size() > 16:
 		past_images.remove_at(0)
@@ -176,12 +178,40 @@ func _process(delta):
 	if Input.is_action_just_pressed("export"):
 		export_project()
 
+func brush(mouse_position_3d: Vector3, color: Color):
+	var current_integer_mouse_coord := calculate_integer_mouse_coordinate(mouse_position_3d)
+	var selected_pixel_3d = Vector3i(floor(mouse_position_3d * float(image_size)))
+	if old_integer_mouse_coord != current_integer_mouse_coord:
+		if brush_radius > 1.0:
+			for x in range(selected_pixel_3d.x - int(ceil(brush_radius)), selected_pixel_3d.x + int(ceil(brush_radius) + 1)):
+				for y in range(selected_pixel_3d.y - int(ceil(brush_radius)), selected_pixel_3d.y + int(ceil(brush_radius) + 1)):
+					for z in range(selected_pixel_3d.z - int(ceil(brush_radius)), selected_pixel_3d.z + int(ceil(brush_radius) + 1)):
+						if Vector3(x, y, z).distance_squared_to(Vector3(selected_pixel_3d)) < brush_radius * brush_radius:
+							color_pixel(Vector3(x, y, z) / float(image_size), color)
+		else:
+			color_pixel(mouse_position_3d, color)
+		
+		old_integer_mouse_coord = current_integer_mouse_coord
+		update_image()
+
+func sphere(start: Vector3, end: Vector3, color: Color):
+	var center := (start + end) * 0.5 * float(image_size)
+	var extents = abs(end - start) * float(image_size)
+	for x in range(int(start.x * image_size), int(end.x * image_size) + 1):
+		for y in range(int(start.y * image_size), int(end.y * image_size) + 1):
+			for z in range(int(start.z * image_size), int(end.z * image_size) + 1):
+				var distance = ((Vector3(x, y, z) - center) / extents).length_squared()
+				if distance < 0.5 * 0.5 and distance > 0.48 * 0.48:
+					color_pixel(Vector3(x, y, z) / float(image_size), color)
+	
+	update_image()
+
 func export_project() -> void:
 	var id := randi() % 4096
 	image.save_png("user://" + str(id) + ".png")
 
 func color_pixel(mouse_position_3d: Vector3, color: Color) -> void:
-	image.set_pixelv(calculate_integer_mouse_coordinate(mouse_position_3d), color)
+	image.set_pixelv(calculate_integer_mouse_coordinate(mouse_position_3d.clamp(Vector3.ZERO, Vector3.ONE * 0.9999)), color)
 
 func calculate_integer_mouse_coordinate(mouse_position_3d: Vector3) -> Vector2i:
 	var pixel_3d = Vector3i(floor(mouse_position_3d * float(image_size)))
@@ -197,3 +227,7 @@ func update_image():
 
 func _on_color_picker_button_color_changed(color):
 	brush_color = color
+
+
+func _on_h_slider_value_changed(value):
+	brush_radius = value
