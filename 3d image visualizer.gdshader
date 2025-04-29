@@ -2,6 +2,8 @@ shader_type canvas_item;
 
 uniform sampler2D image: filter_nearest;
 
+uniform vec4 brush_color = vec4(1.0);
+
 uniform int z_width = 16;
 
 uniform float z_offset : hint_range(0.0, 1.0) = 0.0;
@@ -33,8 +35,8 @@ void fragment() {
 		float offset_from_z_axis = floor(pixel_pos.z * float_z_width) / float_z_width;
 		
 		COLOR = texture(image, scaled_2d_pos + vec2(0.0, offset_from_z_axis)) * modulate;
-		//if (floor(mouse_position * float_z_width) / float_z_width == floor(pixel_pos * float_z_width) / float_z_width) {
-			//COLOR = vec4(1.0);
-		//}
+		if (floor(mouse_position * float_z_width) / float_z_width == floor(pixel_pos * float_z_width) / float_z_width) {
+			COLOR = brush_color;
+		}
 	}
 }

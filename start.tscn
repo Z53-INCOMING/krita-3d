@@ -1,0 +1,100 @@
+[gd_scene load_steps=2 format=3 uid="uid://du7oefc8rjhx3"]
+
+[ext_resource type="Script" path="res://start.gd" id="1_4k52d"]
+
+[node name="start" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_4k52d")
+
+[node name="FileDialog" type="FileDialog" parent="."]
+mode = 4
+title = "Open a File"
+position = Vector2i(380, 350)
+size = Vector2i(1778, 885)
+ok_button_text = "Open"
+file_mode = 0
+access = 2
+filters = PackedStringArray("*.png")
+use_native_dialog = true
+
+[node name="create" type="Button" parent="."]
+layout_mode = 0
+offset_left = 626.0
+offset_top = 685.0
+offset_right = 1205.0
+offset_bottom = 810.0
+theme_override_font_sizes/font_size = 64
+text = "create new file"
+
+[node name="load" type="Button" parent="."]
+layout_mode = 0
+offset_left = 1332.0
+offset_top = 687.0
+offset_right = 1911.0
+offset_bottom = 812.0
+theme_override_font_sizes/font_size = 64
+text = "load file"
+
+[node name="createOptions" type="Control" parent="."]
+visible = false
+anchors_preset = 0
+offset_right = 2557.0
+offset_bottom = 1445.0
+
+[node name="resolutionPicker" type="LineEdit" parent="createOptions"]
+layout_mode = 0
+offset_left = 988.0
+offset_top = 258.0
+offset_right = 1500.0
+offset_bottom = 311.0
+theme_override_font_sizes/font_size = 32
+text = "16"
+placeholder_text = "pixel edge length of cubic image"
+
+[node name="Label2" type="Label" parent="createOptions"]
+layout_mode = 0
+offset_left = 996.0
+offset_top = 422.0
+offset_right = 1501.0
+offset_bottom = 515.0
+theme_override_font_sizes/font_size = 32
+text = "default color (color that
+will fill the canvas upon opening)"
+horizontal_alignment = 1
+
+[node name="ColorPicker" type="ColorPicker" parent="createOptions"]
+layout_mode = 0
+offset_left = 997.0
+offset_top = 534.0
+offset_right = 1502.0
+offset_bottom = 1110.0
+color = Color(0, 0, 0, 1)
+
+[node name="createFile" type="Button" parent="createOptions"]
+layout_mode = 0
+offset_left = 1083.0
+offset_top = 1160.0
+offset_right = 1418.0
+offset_bottom = 1288.0
+theme_override_font_sizes/font_size = 64
+text = "create"
+
+[node name="imageWarning" type="Label" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 730.0
+offset_top = 532.0
+offset_right = 1748.0
+offset_bottom = 620.0
+theme_override_font_sizes/font_size = 64
+text = "Image invalid: image is not cubic!"
+
+[connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
+[connection signal="button_down" from="create" to="." method="_on_create_button_down"]
+[connection signal="button_down" from="load" to="." method="_on_load_button_down"]
+[connection signal="button_down" from="createOptions/createFile" to="." method="_on_create_file_button_down"]

@@ -21,7 +21,7 @@ var z_offset := 0.5
 var image: Image
 
 # Max is 128, works better with powers of two
-var image_size := 32
+var image_size := 16
 
 var old_integer_mouse_coord: Vector2i
 
@@ -40,13 +40,14 @@ var drag_start: Vector3
 var volume_cam_speed := 1.0
 
 func _ready():
-	if true:
-		load_image(Image.load_from_file("user://4d stick figure.png"))
-	else:
+	if Globals.new_file:
+		image_size = Globals.resolution
 		var empty = Image.create_empty(image_size, image_size * image_size, false, Image.FORMAT_RGBA8)
-		empty.fill(Color.BLACK)
+		empty.fill(Globals.background_color)
 		
 		load_image(empty)
+	else:
+		load_image(Image.load_from_file(Globals.file_path))
 
 func load_image(to_load: Image) -> void:
 	image = to_load.duplicate(true)
@@ -75,6 +76,12 @@ func _process(delta):
 	label.text = str(Engine.get_frames_per_second())
 	
 	volume_camera.rotation.y = sin(float(Time.get_ticks_msec()) / 500.0) * 0.125
+	
+	if Input.is_action_just_pressed("save"):
+		if Globals.file_path == "":
+			$FileDialog.popup()
+		else:
+			image.save_png(Globals.file_path)
 	
 	if Input.is_action_pressed("cam forward"):
 		volume_camera.position.z -= volume_cam_speed * delta
@@ -143,7 +150,7 @@ func _process(delta):
 		if Input.is_action_pressed("paint"):
 			brush(mouse_position_3d, brush_color)
 		if Input.is_action_pressed("erase"):
-			brush(mouse_position_3d, Color.BLACK)
+			brush(mouse_position_3d, Globals.background_color)
 		if Input.is_action_just_released("paint") or Input.is_action_just_released("erase"):
 			past_images.append(image.duplicate(true)) # save in case of undo
 			while past_images.size() > point_in_history + 2:
@@ -227,7 +234,13 @@ func update_image():
 
 func _on_color_picker_button_color_changed(color):
 	brush_color = color
+	screen.material.set_shader_parameter("brush_color", brush_color)
 
 
 func _on_h_slider_value_changed(value):
 	brush_radius = value
+
+
+func _on_file_dialog_file_selected(path):
+	image.save_png(path)
+	Globals.file_path = path
