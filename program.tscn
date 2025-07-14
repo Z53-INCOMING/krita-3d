@@ -1,8 +1,8 @@
 [gd_scene load_steps=14 format=3 uid="uid://bx6yxqrt4mq0v"]
 
-[ext_resource type="Script" path="res://program.gd" id="1_5rvem"]
-[ext_resource type="Shader" path="res://3d image visualizer.gdshader" id="1_xyavc"]
-[ext_resource type="Shader" path="res://program.gdshader" id="2_1yiai"]
+[ext_resource type="Script" uid="uid://hhpf5teq0xhw" path="res://program.gd" id="1_5rvem"]
+[ext_resource type="Shader" uid="uid://k11gg71srwkm" path="res://3d image visualizer.gdshader" id="1_xyavc"]
+[ext_resource type="Shader" uid="uid://cecgs36fywowh" path="res://program.gdshader" id="2_1yiai"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h7wj0"]
 shader = ExtResource("2_1yiai")
@@ -14,7 +14,7 @@ shader_parameter/z_width = 16
 shader_parameter/z_offset = 0.5
 shader_parameter/rotation = Basis(1, 0, 0, 0, 1, 0, 0, 0, 1)
 shader_parameter/display_size = 0.5
-shader_parameter/mouse_position = null
+shader_parameter/mouse_position = Vector3(0, 0, 0)
 shader_parameter/modulate = Vector4(1, 1, 1, 1)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hpb36"]
@@ -121,9 +121,9 @@ mesh = SubResource("QuadMesh_7oevu")
 [node name="SubViewportContainer2" type="SubViewportContainer" parent="."]
 layout_mode = 0
 offset_left = 1536.0
-offset_top = 149.0
+offset_top = 232.0
 offset_right = 2560.0
-offset_bottom = 1173.0
+offset_bottom = 1256.0
 
 [node name="SubViewport" type="SubViewport" parent="SubViewportContainer2"]
 own_world_3d = true
@@ -142,7 +142,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
 [node name="Pivot" type="Node3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
 
 [node name="Camera3D" type="Camera3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer/Pivot"]
-transform = Transform3D(1, 0, 0, 0, 0.912777, 0.408458, 0, -0.408458, 0.912777, 0, 1.25, 2.5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
@@ -181,7 +181,6 @@ mode = 4
 title = "Save Image"
 position = Vector2i(380, 350)
 size = Vector2i(1778, 885)
-ok_button_text = "Save"
 access = 2
 filters = PackedStringArray("*.png")
 use_native_dialog = true

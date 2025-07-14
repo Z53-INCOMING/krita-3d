@@ -14,6 +14,8 @@ extends Control
 
 var matrix := Basis.IDENTITY
 
+var volume_texture_matrix := Basis.IDENTITY
+
 var display_size := 0.5
 
 var z_offset := 0.5
@@ -56,7 +58,7 @@ func load_image(to_load: Image) -> void:
 	screen.material.set_shader_parameter("z_width", image_size)
 	
 	var placeholder = PlaceholderTexture2D.new()
-	placeholder.size = Vector2(image_size, image_size)
+	placeholder.size = Vector2(image_size, image_size) * 2
 	volumetric_shader = ShaderMaterial.new()
 	volumetric_shader.shader = load("res://volumetric slice.gdshader")
 	volumetric_shader.set_shader_parameter("image_size", image_size)
@@ -75,26 +77,11 @@ func load_image(to_load: Image) -> void:
 func _process(delta):
 	label.text = str(Engine.get_frames_per_second())
 	
-	volume_camera.rotation.y = sin(float(Time.get_ticks_msec()) / 500.0) * 0.125
-	
 	if Input.is_action_just_pressed("save"):
 		if Globals.file_path == "":
 			$FileDialog.popup()
 		else:
 			image.save_png(Globals.file_path)
-	
-	if Input.is_action_pressed("cam forward"):
-		volume_camera.position.z -= volume_cam_speed * delta
-	if Input.is_action_pressed("cam backward"):
-		volume_camera.position.z += volume_cam_speed * delta
-	if Input.is_action_pressed("cam left"):
-		volume_camera.position.x -= volume_cam_speed * delta
-	if Input.is_action_pressed("cam right"):
-		volume_camera.position.x += volume_cam_speed * delta
-	if Input.is_action_pressed("cam down"):
-		volume_camera.position.y -= volume_cam_speed * delta
-	if Input.is_action_pressed("cam up"):
-		volume_camera.position.y += volume_cam_speed * delta
 	
 	if Input.is_action_pressed("rotate left"):
 		matrix = Basis.from_euler(Vector3(0.0, -delta, 0.0) * 2.0) * matrix
@@ -230,6 +217,15 @@ func update_image():
 	
 	screen.material.set_shader_parameter("image", texture)
 	volumetric_shader.set_shader_parameter("image", texture)
+	volumetric_shader.set_shader_parameter("rotation", volume_texture_matrix)
+
+func _input(event):
+	if event is InputEventMouseMotion:
+		if get_global_mouse_position().x > 1280:
+			if Input.is_action_pressed("pan"):
+				volume_texture_matrix *= Basis.from_euler(Vector3(0.0, -event.relative.x / 432.0, 0.0))
+				volume_texture_matrix *= Basis.from_euler(Vector3(event.relative.y / 432.0, 0.0, 0.0))
+				volumetric_shader.set_shader_parameter("rotation", volume_texture_matrix)
 
 
 func _on_color_picker_button_color_changed(color):
