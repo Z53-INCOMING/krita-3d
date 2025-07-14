@@ -62,13 +62,13 @@ func load_image(to_load: Image) -> void:
 	volumetric_shader = ShaderMaterial.new()
 	volumetric_shader.shader = load("res://volumetric slice.gdshader")
 	volumetric_shader.set_shader_parameter("image_size", image_size)
-	for i in image_size:
+	for i in image_size * 2:
 		var sprite = Sprite3D.new()
 		
 		sprite.texture = placeholder
 		sprite.pixel_size = 2.0 / float(image_size)
 		sprite.material_override = volumetric_shader
-		sprite.position.z = (float(i) / float(image_size)) * 2.0 - 1.0
+		sprite.position.z = (float(i) / float(image_size)) * 2.0 - 2.0
 		
 		volume.add_child(sprite)
 	
@@ -115,16 +115,23 @@ func _process(delta):
 	
 	screen.material.set_shader_parameter("mouse_position", mouse_position_3d)
 	
-	if Input.is_action_just_released("scroll_down"):
-		if Input.is_action_pressed("shift"):
-			z_offset -= 1.0 / 8.0
-		else:
-			z_offset -= 1.0 / float(image_size)
-	if Input.is_action_just_released("scroll_up"):
-		if Input.is_action_pressed("shift"):
-			z_offset += 1.0 / 8.0
-		else:
-			z_offset += 1.0 / float(image_size)
+	if get_global_mouse_position().x < 1280:
+		if Input.is_action_just_released("scroll_down"):
+			if Input.is_action_pressed("shift"):
+				z_offset -= 1.0 / 8.0
+			else:
+				z_offset -= 1.0 / float(image_size)
+		if Input.is_action_just_released("scroll_up"):
+			if Input.is_action_pressed("shift"):
+				z_offset += 1.0 / 8.0
+			else:
+				z_offset += 1.0 / float(image_size)
+	else:
+		if Input.is_action_just_released("scroll_down"):
+			volume_camera.position.z += 0.25
+		if Input.is_action_just_released("scroll_up"):
+			volume_camera.position.z -= 0.25
+		volume_camera.position.z = clampf(volume_camera.position.z, 0.25, 3.0)
 	z_offset = clampf(z_offset, 0.0, float(image_size - 1) / float(image_size))
 	screen.material.set_shader_parameter("z_offset", z_offset + (1.0 / 1000.0))
 	intersection_plane.position.z = z_offset - 0.5
@@ -232,11 +239,15 @@ func _on_color_picker_button_color_changed(color):
 	brush_color = color
 	screen.material.set_shader_parameter("brush_color", brush_color)
 
-
 func _on_h_slider_value_changed(value):
 	brush_radius = value
-
 
 func _on_file_dialog_file_selected(path):
 	image.save_png(path)
 	Globals.file_path = path
+
+func _on_alpha_slider_value_changed(value):
+	volumetric_shader.set_shader_parameter("alpha", value)
+
+func _on_disable_black_toggled(toggled_on):
+	volumetric_shader.set_shader_parameter("disable_black", toggled_on)

@@ -1,8 +1,10 @@
-[gd_scene load_steps=14 format=3 uid="uid://bx6yxqrt4mq0v"]
+[gd_scene load_steps=16 format=3 uid="uid://bx6yxqrt4mq0v"]
 
 [ext_resource type="Script" uid="uid://hhpf5teq0xhw" path="res://program.gd" id="1_5rvem"]
 [ext_resource type="Shader" uid="uid://k11gg71srwkm" path="res://3d image visualizer.gdshader" id="1_xyavc"]
 [ext_resource type="Shader" uid="uid://cecgs36fywowh" path="res://program.gdshader" id="2_1yiai"]
+[ext_resource type="Texture2D" uid="uid://mbdud4oluubw" path="res://checked.png" id="4_6oq2n"]
+[ext_resource type="Texture2D" uid="uid://yba0ag5w1fsa" path="res://unchecked.png" id="5_ngr8y"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_h7wj0"]
 shader = ExtResource("2_1yiai")
@@ -58,8 +60,8 @@ script = ExtResource("1_5rvem")
 [node name="Background" type="ColorRect" parent="."]
 material = SubResource("ShaderMaterial_h7wj0")
 layout_mode = 0
-offset_right = 2573.0
-offset_bottom = 1466.0
+offset_right = 2560.0
+offset_bottom = 1440.0
 color = Color(0.0926804, 0.0926804, 0.0926804, 1)
 
 [node name="Screen" type="ColorRect" parent="."]
@@ -140,9 +142,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0, 0)
 [node name="VolumetricTexture" type="Node3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
 
 [node name="Pivot" type="Node3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
 [node name="Camera3D" type="Camera3D" parent="SubViewportContainer2/SubViewport/VolumetricTextureViewer/Pivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 3)
 
 [node name="Label" type="Label" parent="."]
 layout_mode = 0
@@ -185,6 +187,30 @@ access = 2
 filters = PackedStringArray("*.png")
 use_native_dialog = true
 
+[node name="AlphaSlider" type="HSlider" parent="."]
+layout_mode = 0
+offset_left = 1318.0
+offset_top = 1387.0
+offset_right = 2550.0
+offset_bottom = 1431.0
+min_value = 0.001
+max_value = 1.0
+step = 0.0
+value = 0.125
+exp_edit = true
+
+[node name="DisableBlack" type="CheckBox" parent="."]
+layout_mode = 0
+offset_left = 2287.0
+offset_top = 1320.0
+offset_right = 2551.0
+offset_bottom = 1392.0
+theme_override_icons/checked = ExtResource("4_6oq2n")
+theme_override_icons/unchecked = ExtResource("5_ngr8y")
+text = "Make Black Transparent"
+
 [connection signal="color_changed" from="ColorPickerButton" to="." method="_on_color_picker_button_color_changed"]
 [connection signal="value_changed" from="HSlider" to="." method="_on_h_slider_value_changed"]
 [connection signal="file_selected" from="FileDialog" to="." method="_on_file_dialog_file_selected"]
+[connection signal="value_changed" from="AlphaSlider" to="." method="_on_alpha_slider_value_changed"]
+[connection signal="toggled" from="DisableBlack" to="." method="_on_disable_black_toggled"]
