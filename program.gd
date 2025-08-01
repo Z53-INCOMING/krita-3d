@@ -141,6 +141,17 @@ func _process(delta):
 				z_offset += 1.0 / 8.0
 			else:
 				z_offset += 1.0 / float(image_size)
+		
+		if Input.is_action_pressed("backward"):
+			if Input.is_action_pressed("shift"):
+				z_offset -= delta / 2.0
+			else:
+				z_offset -= delta / float(image_size) * 8.0
+		if Input.is_action_pressed("forward"):
+			if Input.is_action_pressed("shift"):
+				z_offset += delta / 2.0
+			else:
+				z_offset += delta / float(image_size) * 8.0
 	else:
 		if Input.is_action_just_released("scroll_down"):
 			volume_camera.position.z += 0.25
@@ -194,6 +205,22 @@ func _process(delta):
 				point_in_history = past_images.size() - 1
 				image = past_images[-1].duplicate(true)
 				update_image()
+	
+	var camera_rotated_this_frame := false
+	if Input.is_action_pressed("cam left"):
+		volume_texture_matrix *= Basis.from_euler(Vector3(0.0, -0.8 * delta, 0.0))
+		camera_rotated_this_frame = true
+	if Input.is_action_pressed("cam right"):
+		volume_texture_matrix *= Basis.from_euler(Vector3(0.0, 0.8 * delta, 0.0))
+		camera_rotated_this_frame = true
+	if Input.is_action_pressed("cam up"):
+		volume_texture_matrix *= Basis.from_euler(Vector3(0.8 * delta, 0.0, 0.0))
+		camera_rotated_this_frame = true
+	if Input.is_action_pressed("cam down"):
+		volume_texture_matrix *= Basis.from_euler(Vector3(-0.8 * delta, 0.0, 0.0))
+		camera_rotated_this_frame = true
+	if camera_rotated_this_frame:
+		volumetric_shader.set_shader_parameter("rotation", volume_texture_matrix)
 	
 	if Input.is_action_just_pressed("export"):
 		export_project()
