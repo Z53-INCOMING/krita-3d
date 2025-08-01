@@ -235,9 +235,11 @@ func calculate_integer_mouse_coordinate(mouse_position_3d: Vector3) -> Vector2i:
 	#return Vector2i(int(mouse_position_3d.x * image_size), int(mouse_position_3d.y * image_size) + (int(mouse_position_3d.z * image_size) * image_size))
 
 func update_image():
-	var texture = ImageTexture.create_from_image(image)
+	var linear_image = image.duplicate(true)
+	linear_image.srgb_to_linear()
+	var texture = ImageTexture.create_from_image(linear_image)
 	
-	screen.material.set_shader_parameter("image", texture)
+	screen.material.set_shader_parameter("image", ImageTexture.create_from_image(image))
 	volumetric_shader.set_shader_parameter("image", texture)
 	volumetric_shader.set_shader_parameter("rotation", volume_texture_matrix)
 
