@@ -177,6 +177,25 @@ max_value = 8.0
 step = 0.25
 value = 1.0
 
+[node name="CurrentTool" type="Label" parent="."]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 694.0
+offset_right = 55.0
+offset_bottom = 717.0
+theme_override_font_sizes/font_size = 32
+text = "Tool: Brush"
+
+[node name="Tools" type="Label" parent="."]
+layout_mode = 0
+offset_left = 15.0
+offset_top = 747.0
+offset_right = 189.0
+offset_bottom = 792.0
+theme_override_font_sizes/font_size = 24
+text = "Brush: B
+Fill: F"
+
 [node name="FileDialog" type="FileDialog" parent="."]
 auto_translate_mode = 1
 mode = 4

@@ -41,6 +41,10 @@ var drag_start: Vector3
 
 var volume_cam_speed := 1.0
 
+var tool := 0
+
+@onready var tool_label := $CurrentTool
+
 func _ready():
 	if Globals.new_file:
 		image_size = Globals.resolution
@@ -75,6 +79,17 @@ func load_image(to_load: Image) -> void:
 	update_image()
 
 func _process(delta):
+	if Input.is_action_just_pressed("brush"):
+		tool = 0
+	if Input.is_action_just_pressed("fill"):
+		tool = 1
+	
+	match tool:
+		0:
+			tool_label.text = "Tool: Brush"
+		1:
+			tool_label.text = "Tool: Fill"
+	
 	label.text = str(Engine.get_frames_per_second())
 	
 	if Input.is_action_just_pressed("save"):
