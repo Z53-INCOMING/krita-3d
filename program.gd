@@ -157,7 +157,11 @@ func _process(delta):
 		#if Input.is_action_just_released("paint"):
 			#sphere(drag_start, mouse_position_3d, brush_color)
 		if Input.is_action_pressed("paint"):
-			brush(mouse_position_3d, brush_color)
+			match tool:
+				0:
+					brush(mouse_position_3d, brush_color)
+				1:
+					fill(mouse_position_3d, brush_color)
 		if Input.is_action_pressed("erase"):
 			brush(mouse_position_3d, Globals.background_color)
 		if Input.is_action_just_released("paint") or Input.is_action_just_released("erase"):
@@ -206,6 +210,15 @@ func brush(mouse_position_3d: Vector3, color: Color):
 							color_pixel(Vector3(x, y, z) / float(image_size), color)
 		else:
 			color_pixel(mouse_position_3d, color)
+		
+		old_integer_mouse_coord = current_integer_mouse_coord
+		update_image()
+
+func fill(mouse_position_3d: Vector3, color: Color):
+	var current_integer_mouse_coord := calculate_integer_mouse_coordinate(mouse_position_3d)
+	var selected_pixel_3d = Vector3i(floor(mouse_position_3d * float(image_size)))
+	if old_integer_mouse_coord != current_integer_mouse_coord:
+		color_pixel(mouse_position_3d, color)
 		
 		old_integer_mouse_coord = current_integer_mouse_coord
 		update_image()
